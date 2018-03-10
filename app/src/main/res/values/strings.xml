@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Roommate App</string>
+    <string name="chores_label">Chores</string>
+    <string name="schedule_label">Schedule</string>
+    <string name="pay_label">Payment</string>
+    <string name="shop_label">Shopping List</string>
 </resources>
