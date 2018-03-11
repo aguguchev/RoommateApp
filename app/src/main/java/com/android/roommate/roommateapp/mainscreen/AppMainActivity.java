@@ -1,10 +1,15 @@
-package com.android.roommate.roommateapp;
+package com.android.roommate.roommateapp.mainscreen;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
+
+import com.android.roommate.roommateapp.payments.PayMainActivity;
+import com.android.roommate.roommateapp.R;
+import com.android.roommate.roommateapp.schedule.ScheduleMainActivity;
+import com.android.roommate.roommateapp.shoppinglist.ShoppingMainActivity;
+import com.android.roommate.roommateapp.chores.ChoresMainActivity;
 
 public class AppMainActivity extends AppCompatActivity {
 

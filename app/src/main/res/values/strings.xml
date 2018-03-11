@@ -4,4 +4,7 @@
     <string name="schedule_label">Schedule</string>
     <string name="pay_label">Payment</string>
     <string name="shop_label">Shopping List</string>
+    <string name="freq_daily">Daily</string>
+    <string name="freq_weekly">Weekly</string>
+    <string name="freq_monthly">Monthly</string>
 </resources>

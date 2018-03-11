@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".AppMainActivity">
+        <activity android:name=".mainscreen.AppMainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -17,28 +17,28 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ChoresMainActivity">
+        <activity android:name=".chores.ChoresMainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".AppMainActivity" />
+                android:value=".mainscreen.AppMainActivity" />
         </activity>
 
-        <activity android:name=".PayMainActivity">
+        <activity android:name=".payments.PayMainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".AppMainActivity" />
+                android:value=".mainscreen.AppMainActivity" />
         </activity>
 
-        <activity android:name=".ScheduleMainActivity">
+        <activity android:name=".schedule.ScheduleMainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".AppMainActivity" />
+                android:value=".mainscreen.AppMainActivity" />
         </activity>
 
-        <activity android:name=".ShoppingMainActivity">
+        <activity android:name=".shoppinglist.ShoppingMainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".AppMainActivity" />
+                android:value=".mainscreen.AppMainActivity" />
         </activity>
     </application>
 
