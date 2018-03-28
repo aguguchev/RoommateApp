@@ -7,4 +7,14 @@
     <string name="freq_daily">Daily</string>
     <string name="freq_weekly">Weekly</string>
     <string name="freq_monthly">Monthly</string>
+    <string name="content_desc_new_chore">New Chore</string>
+    <string name="description">Description</string>
+    <string name="save">Save</string>
+    <string name="chores_desc_data_id">desc_data</string>
+    <string name="chores_freq_data_id">freq_data</string>
+    <string-array name="chores_frequencies">
+        <item>Daily</item>
+        <item>Weekly</item>
+        <item>Monthly</item>
+    </string-array>
 </resources>

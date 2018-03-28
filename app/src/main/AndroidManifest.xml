@@ -23,6 +23,12 @@
                 android:value=".mainscreen.AppMainActivity" />
         </activity>
 
+        <activity android:name=".chores.NewChoreActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".chores.ChoresMainActivity"/>
+        </activity>
+
         <activity android:name=".payments.PayMainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

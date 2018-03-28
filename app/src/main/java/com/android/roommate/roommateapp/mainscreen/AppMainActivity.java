@@ -31,6 +31,7 @@ public class AppMainActivity extends AppCompatActivity {
         findViewById(R.id.shop_butt).setOnClickListener(clickListener);
     }
 
+    //called by mainscreen buttons
     public void navToFunction(View view){
         int id = view.getId();
         Intent intent = null;
@@ -46,9 +47,5 @@ public class AppMainActivity extends AppCompatActivity {
         if(intent != null){
             startActivity(intent);
         }
-    }
-
-    public void sendMessage(View view){
-
     }
 }
