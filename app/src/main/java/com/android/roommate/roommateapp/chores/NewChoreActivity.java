@@ -2,15 +2,15 @@ package com.android.roommate.roommateapp.chores;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.roommate.roommateapp.R;
 
@@ -23,12 +23,13 @@ public class NewChoreActivity extends AppCompatActivity {
     EditText descriptionInput;
     Spinner freqSpinner;
     String spinnerSelection;
+    private Handler editTextFocuser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        getSupportActionBar().hide();
-        setContentView(R.layout.new_chore_activity);
+        ///////////////////////////////////////////////////////////////getSupportActionBar().hide();
+        setContentView(R.layout.activity_new_chore);
 
         //set view fields
         descriptionInput = (EditText)findViewById(R.id.new_chore_desc_input);
@@ -54,6 +55,35 @@ public class NewChoreActivity extends AppCompatActivity {
             }
         });
 
+        //auto focus on edittext and show keyboard
+        editTextFocuser = new Handler();
+        final Runnable focuser = new Runnable() {
+            @Override
+            public void run() {
+                descriptionInput.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(),
+                        SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN , 0, 0, 0));
+                descriptionInput.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(),
+                        SystemClock.uptimeMillis(), MotionEvent.ACTION_UP , 0, 0, 0));
+            }
+        };
+        editTextFocuser.postDelayed(focuser, 150);
+
+        //set frame layout to redirect clicks to edittext
+        FrameLayout fLayout = (FrameLayout)findViewById(R.id.desc_inputbox);
+        fLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editTextFocuser.postDelayed(focuser, 150);
+            }
+        });
+
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        descriptionInput.setFocusable(true);
+        descriptionInput.requestFocus();
     }
 
     public void cancelNewChore(){
