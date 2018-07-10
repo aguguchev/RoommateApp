@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.Spinner;
 
+import com.android.roommate.roommateapp.BuildConfig;
 import com.android.roommate.roommateapp.R;
 
 /**
@@ -36,8 +37,15 @@ public class NewChoreActivity extends AppCompatActivity {
         freqSpinner = (Spinner)findViewById(R.id.new_chore_frequency_spinner);
 
         //set adapter and initialize values for spinner
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.chores_frequencies, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> adapter;
+        if(!BuildConfig.DEBUG){
+            adapter= ArrayAdapter.createFromResource(this, R.array.chores_frequencies,
+                    android.R.layout.simple_spinner_item);
+        }
+        else{
+            adapter = ArrayAdapter.createFromResource(this,
+                    R.array.debug_chores_frequencies, android.R.layout.simple_spinner_item);
+        }
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         freqSpinner.setAdapter(adapter);
 

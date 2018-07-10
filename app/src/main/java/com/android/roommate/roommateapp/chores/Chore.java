@@ -23,11 +23,13 @@ class Chore {
         calendar.setLenient(true);
         if(completed){
             switch(frequency) {
-                case "daily":
+                case "Debug":
+                    calendar.add(Calendar.SECOND, -30);
+                case "Daily":
                     calendar.add(Calendar.DATE, -1);
-                case "weekly":
+                case "Weekly":
                     calendar.add(Calendar.DATE, -7);
-                case "monthly":
+                case "Monthly":
                     calendar.add(Calendar.MONTH, -1);
             }
             Date compareDate = calendar.getTime();

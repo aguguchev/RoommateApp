@@ -1,22 +1,22 @@
 package com.android.roommate.roommateapp.mainscreen;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.android.roommate.roommateapp.payments.PayMainActivity;
 import com.android.roommate.roommateapp.R;
+import com.android.roommate.roommateapp.chores.ChoresMainActivity;
+import com.android.roommate.roommateapp.payments.PayMainActivity;
 import com.android.roommate.roommateapp.schedule.ScheduleMainActivity;
 import com.android.roommate.roommateapp.shoppinglist.ShoppingMainActivity;
-import com.android.roommate.roommateapp.chores.ChoresMainActivity;
 
 public class AppMainActivity extends AppCompatActivity {
 

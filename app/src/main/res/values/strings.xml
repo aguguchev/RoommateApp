@@ -18,4 +18,17 @@
         <item>Weekly</item>
         <item>Monthly</item>
     </string-array>
+    <string-array name="debug_chores_frequencies">
+        <item>Debug</item>
+        <item>Daily</item>
+        <item>Weekly</item>
+        <item>Monthly</item>
+    </string-array>
+    <string-array name="report_time_intervals">
+        <item>Last 7 Days</item>
+        <item>Last 2 Weeks</item>
+        <item>Last Month</item>
+        <item>Last 3 Months</item>
+        <item>All Time</item>
+    </string-array>
 </resources>

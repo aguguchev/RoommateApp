@@ -1,15 +1,11 @@
 package com.android.roommate.roommateapp.chores;
 
-import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.database.DataSetObserver;
-import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.ExpandableListAdapter;
 import android.widget.TextView;
 
 import com.android.roommate.roommateapp.R;
@@ -27,7 +23,6 @@ public class ChoresExpandableListAdapter extends BaseExpandableListAdapter {
     private Context context;
     private List<String> listTitles;
     private HashMap<String, List<Chore>> listDetail;
-    private ChoresDataHandler choresData;
     private DataSetObserver dataSetObserver = null;
 
     public ChoresExpandableListAdapter(Context c){
@@ -35,7 +30,6 @@ public class ChoresExpandableListAdapter extends BaseExpandableListAdapter {
         context = c;
         listTitles = new ArrayList<String>();
         listDetail = new HashMap<String, List<Chore>>();
-        choresData = new ChoresDataHandler();
     }
     public ChoresExpandableListAdapter(Context c, List<String> titles,
                                        HashMap<String, List<Chore>> detail){
@@ -43,7 +37,6 @@ public class ChoresExpandableListAdapter extends BaseExpandableListAdapter {
         context = c;
         listTitles = titles;
         listDetail = detail;
-        choresData = new ChoresDataHandler();
     }
 
     public void addChore(String title, String desc){
