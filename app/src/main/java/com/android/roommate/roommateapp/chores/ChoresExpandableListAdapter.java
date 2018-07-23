@@ -2,6 +2,7 @@ package com.android.roommate.roommateapp.chores;
 
 import android.content.Context;
 import android.database.DataSetObserver;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,12 +25,26 @@ public class ChoresExpandableListAdapter extends BaseExpandableListAdapter {
     private List<String> listTitles;
     private HashMap<String, List<Chore>> listDetail;
     private DataSetObserver dataSetObserver = null;
+    private ChoresDatabase choresDB;
 
     public ChoresExpandableListAdapter(Context c){
         super();
         context = c;
         listTitles = new ArrayList<String>();
         listDetail = new HashMap<String, List<Chore>>();
+        choresDB = new ChoresDatabase(c);
+
+        //fill list with stored chores
+        ChoresDatabase.ChoresCursor cc = choresDB.getChores();
+        Log.d("dbPersistence", cc.toString());
+        Log.d("dbPersistence", cc.getCount() + " ");
+        if(cc != null && cc.getCount() > 0){
+            do {
+                Log.d("dbPersistence", cc.hashCode() + ": Chore retrieved from db");
+                addChore(new Chore(cc.getColChoresID(), cc.getColChoresLastComplete(),
+                        cc.getColChoresDesc(), cc.getColChoresFreq()));
+            } while(cc.moveToNext());
+        }
     }
     public ChoresExpandableListAdapter(Context c, List<String> titles,
                                        HashMap<String, List<Chore>> detail){
@@ -39,21 +54,52 @@ public class ChoresExpandableListAdapter extends BaseExpandableListAdapter {
         listDetail = detail;
     }
 
-    public void addChore(String title, String desc){
-        if(!listTitles.contains(title)){
-            listTitles.add(title);
-            listDetail.put(title, new ArrayList<Chore>());
-        }
-        listDetail.get(title).add(new Chore(title, desc));
+    public void addChore(String desc, String freq){
+        if(!listTitles.contains(freq))
+            setNewFreq(freq);
+        Chore c = choresDB.addChore(desc, freq);
+        listDetail.get(freq).add(c);
+    }
+
+    public void addChore(Chore c){
+        if(!listTitles.contains(c.getFrequency()))
+            setNewFreq(c.getFrequency());
+        listDetail.get(c.getFrequency()).add(c);
     }
 
     public void completeChore(int group, int item){
-        if(group < 0 || item < 0 || group > listTitles.size()
-                || item > listDetail.get(listTitles.get(group)).size()){
-            throw new RuntimeException("Invalid chore to complete");
-        }
+        checkValidChore(group, item);
         Chore toComplete = listDetail.get(listTitles.get(group)).get(item);
         toComplete.complete();
+        choresDB.editChore(toComplete.getId(), toComplete.getDescription(), toComplete.getFrequency(),
+                toComplete.getLastComplete().getTime());
+    }
+
+    public void deleteChore(int group, int item){
+        checkValidChore(group, item);
+        Chore toDelete = listDetail.get(listTitles.get(group)).get(item);
+        choresDB.deleteChore(toDelete.getId());
+        listDetail.get(listTitles.get(group)).remove(item);
+    }
+
+    public void editChore(int group, int item, String desc, String freq){
+        checkValidChore(group, item);
+        Chore toEdit = listDetail.get(listTitles.get(group)).get(item);
+        toEdit.setDescription(desc);
+        toEdit.setFrequency((freq));
+        choresDB.editChore(toEdit.getId(), desc, freq, toEdit.getLastComplete().getTime());
+    }
+
+    private void setNewFreq(String freq){
+        listTitles.add(freq);
+        listDetail.put(freq, new ArrayList<Chore>());
+    }
+
+    private void checkValidChore(int group, int item){
+        if(group < 0 || item < 0 || group > listTitles.size()
+                || item > listDetail.get(listTitles.get(group)).size()){
+            throw new RuntimeException("Invalid chore to edit");
+        }
     }
 
     @Override

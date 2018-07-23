@@ -23,8 +23,8 @@ public class MainChoresFrag extends Fragment {
     ChoresExpandableListAdapter choresController;
     ExpandableListView expListView;
     ImageButton newChoreButton;
-    final int NEW_CHORE_REQUEST_CODE = 10;
-    final int SHOW_CHORE_REQUEST_CODE = 20;
+    private final int NEW_CHORE_REQUEST_CODE = 10;
+    private final int SHOW_CHORE_REQUEST_CODE = 20;
     private int selectedChoreGroup;
     private int selectedChoreItem;
     private View myView;
@@ -34,7 +34,6 @@ public class MainChoresFrag extends Fragment {
 
     public void onCreate(Bundle state){
         super.onCreate(state);
-
     }
 
     @Override
@@ -51,16 +50,18 @@ public class MainChoresFrag extends Fragment {
         expListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
-                showChore(i, i1, l);
+                launchShowChoreActivity(i, i1, l);
                 return false;
             }
         });
+        for(int i = 0; i < choresController.getGroupCount(); i++)
+            expListView.expandGroup(i);
 
         //attach support objects to chore button
         newChoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createNewChore();
+                launchCreateChoreActivity();
             }
         });
 
@@ -108,18 +109,18 @@ public class MainChoresFrag extends Fragment {
         Log.d("debug", str);
     }
 
-    private void showChore(int i, int i1, long l){
+    private void launchShowChoreActivity(int i, int i1, long l){
         selectedChoreGroup = i;
         selectedChoreItem = i1;
 
         Chore toShow = (Chore)choresController.getChild(i, i1);
         Intent showChoreIntent = new Intent(myView.getContext(), ShowChoreActivity.class);
-        showChoreIntent.putExtra("description", toShow.getDescription());
-        showChoreIntent.putExtra("frequency", toShow.getFrequency());
+        showChoreIntent.putExtra(ShowChoreActivity.FIELD_DESC, toShow.getDescription());
+        showChoreIntent.putExtra(ShowChoreActivity.FIELD_FREQ, toShow.getFrequency());
         startActivityForResult(showChoreIntent, SHOW_CHORE_REQUEST_CODE);
     }
 
-    public void createNewChore(){
+    public void launchCreateChoreActivity(){
         Intent newChoreIntent = new Intent(myView.getContext(), NewChoreActivity.class);
         startActivityForResult(newChoreIntent, NEW_CHORE_REQUEST_CODE);
     }
@@ -127,14 +128,26 @@ public class MainChoresFrag extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         if(requestCode == NEW_CHORE_REQUEST_CODE && resultCode == RESULT_OK){
-            String title = data.getStringExtra(getResources().getString(R.string.chores_freq_data_id));
-            String desc = data.getStringExtra(getResources().getString(R.string.chores_desc_data_id));
-            choresController.addChore(title, desc);
+            String freq = data.getStringExtra(NewChoreActivity.FREQ);
+            String desc = data.getStringExtra(NewChoreActivity.DESC);
+            choresController.addChore(desc, freq);
             choresController.notifyDataSetChanged();
         }
         else if(requestCode == SHOW_CHORE_REQUEST_CODE && resultCode == RESULT_OK){
-            choresController.completeChore(selectedChoreGroup, selectedChoreItem);
+            int res = data.getIntExtra(ShowChoreActivity.IS_COMPLETED, -1);
+            Log.d("stddebug", "Returning to main chores frag with code " + res);
+            if(res == ShowChoreActivity.COMPLETE)
+                choresController.completeChore(selectedChoreGroup, selectedChoreItem);
+            else if(res == ShowChoreActivity.DELETE)
+                choresController.deleteChore(selectedChoreGroup, selectedChoreItem);
+            else if(res == ShowChoreActivity.EDIT) {
+                String desc = data.getStringExtra(ShowChoreActivity.FIELD_DESC);
+                String freq = data.getStringExtra(ShowChoreActivity.FIELD_FREQ);
+                choresController.editChore(selectedChoreGroup, selectedChoreItem, desc, freq);
+            }
             choresController.notifyDataSetChanged();
+
+            //clears selection from fragment memory (?)
             selectedChoreItem = -1;
             selectedChoreGroup = -1;
         }

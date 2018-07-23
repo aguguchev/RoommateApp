@@ -23,8 +23,11 @@ public class NewChoreActivity extends AppCompatActivity {
 
     EditText descriptionInput;
     Spinner freqSpinner;
-    String spinnerSelection;
     private Handler editTextFocuser;
+
+    public static final String IS_EDIT = "isEdit";
+    public static final String DESC = "desc";
+    public static final String FREQ = "freq";
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -33,13 +36,13 @@ public class NewChoreActivity extends AppCompatActivity {
         setContentView(R.layout.activity_new_chore);
 
         //set view fields
-        descriptionInput = (EditText)findViewById(R.id.new_chore_desc_input);
-        freqSpinner = (Spinner)findViewById(R.id.new_chore_frequency_spinner);
+        descriptionInput = findViewById(R.id.new_chore_desc_input);
+        freqSpinner = findViewById(R.id.new_chore_frequency_spinner);
 
         //set adapter and initialize values for spinner
         ArrayAdapter<CharSequence> adapter;
         if(!BuildConfig.DEBUG){
-            adapter= ArrayAdapter.createFromResource(this, R.array.chores_frequencies,
+            adapter = ArrayAdapter.createFromResource(this, R.array.chores_frequencies,
                     android.R.layout.simple_spinner_item);
         }
         else{
@@ -85,6 +88,13 @@ public class NewChoreActivity extends AppCompatActivity {
             }
         });
 
+        //check if meant for edit and if so populates fields
+        Intent intent = getIntent();
+        if(intent.getBooleanExtra(IS_EDIT, false)){
+            descriptionInput.setText(intent.getStringExtra(DESC));
+            setSpinnerSelection(intent.getStringExtra(FREQ));
+        }
+
     }
 
     @Override
@@ -103,11 +113,20 @@ public class NewChoreActivity extends AppCompatActivity {
     public void saveNewChore(){
         Intent resIntent = new Intent();
         //Toast.makeText(this, descriptionInput.getEditableText(), Toast.LENGTH_LONG);
-        resIntent.putExtra((String)getResources().getText(R.string.chores_desc_data_id),
-                descriptionInput.getEditableText().toString());
-        resIntent.putExtra((String)getResources().getText(R.string.chores_freq_data_id),
-                freqSpinner.getSelectedItem().toString());
+        resIntent.putExtra(DESC, descriptionInput.getEditableText().toString());
+        resIntent.putExtra(FREQ, freqSpinner.getSelectedItem().toString());
         setResult(RESULT_OK, resIntent);
         finish();
+    }
+
+    private void setSpinnerSelection(String freq){
+        String[] temp;
+        if(!BuildConfig.DEBUG)
+            temp = getResources().getStringArray(R.array.chores_frequencies);
+        else
+            temp = getResources().getStringArray(R.array.debug_chores_frequencies);
+        for(int i = 0; i < temp.length; i++)
+            if(temp[i].equals(freq))
+                freqSpinner.setSelection(i);
     }
 }
