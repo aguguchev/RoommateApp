@@ -10,11 +10,13 @@ class Chore {
     private Date lastComplete;
     private boolean completed;
     private int id;
+    private int value;
 
-    Chore(int id, long lC, String desc, String freq){
+    Chore(int id, long lC, String desc, String freq, int val){
         description = desc;
         frequency = freq;
         lastComplete = new Date(lC);
+        value = val;
         if(isCompleted(lastComplete, freq))
             completed = true;
         else
@@ -65,6 +67,13 @@ class Chore {
     int getId() {return id;}
     boolean isCompleted(){
         return completed;
+    }
+    int getValue() {return value;}
+    void setValue(int v) throws Exception{
+        if(v < 0){
+            throw new Exception("Chore value must be greater than or equal to zero");
+        }
+        value = v;
     }
     void setDescription(String d){ description = d;}
     void setFrequency(String f){ frequency = f;}

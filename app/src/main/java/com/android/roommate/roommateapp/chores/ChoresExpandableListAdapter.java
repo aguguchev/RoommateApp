@@ -42,7 +42,7 @@ public class ChoresExpandableListAdapter extends BaseExpandableListAdapter {
             do {
                 Log.d("dbPersistence", cc.hashCode() + ": Chore retrieved from db");
                 addChore(new Chore(cc.getColChoresID(), cc.getColChoresLastComplete(),
-                        cc.getColChoresDesc(), cc.getColChoresFreq()));
+                        cc.getColChoresDesc(), cc.getColChoresFreq(), cc.getColChoresVal()));
             } while(cc.moveToNext());
         }
     }
@@ -54,10 +54,10 @@ public class ChoresExpandableListAdapter extends BaseExpandableListAdapter {
         listDetail = detail;
     }
 
-    public void addChore(String desc, String freq){
+    public void addChore(String desc, String freq, int val){
         if(!listTitles.contains(freq))
             setNewFreq(freq);
-        Chore c = choresDB.addChore(desc, freq);
+        Chore c = choresDB.addChore(desc, freq, val);
         listDetail.get(freq).add(c);
     }
 
@@ -72,7 +72,7 @@ public class ChoresExpandableListAdapter extends BaseExpandableListAdapter {
         Chore toComplete = listDetail.get(listTitles.get(group)).get(item);
         toComplete.complete();
         choresDB.editChore(toComplete.getId(), toComplete.getDescription(), toComplete.getFrequency(),
-                toComplete.getLastComplete().getTime());
+                toComplete.getLastComplete().getTime(), toComplete.getValue());
     }
 
     public void deleteChore(int group, int item){
@@ -82,12 +82,13 @@ public class ChoresExpandableListAdapter extends BaseExpandableListAdapter {
         listDetail.get(listTitles.get(group)).remove(item);
     }
 
-    public void editChore(int group, int item, String desc, String freq){
+    public void editChore(int group, int item, String desc, String freq, int val) throws Exception{
         checkValidChore(group, item);
         Chore toEdit = listDetail.get(listTitles.get(group)).get(item);
         toEdit.setDescription(desc);
         toEdit.setFrequency((freq));
-        choresDB.editChore(toEdit.getId(), desc, freq, toEdit.getLastComplete().getTime());
+        toEdit.setValue(val);
+        choresDB.editChore(toEdit.getId(), desc, freq, toEdit.getLastComplete().getTime(), val);
     }
 
     private void setNewFreq(String freq){

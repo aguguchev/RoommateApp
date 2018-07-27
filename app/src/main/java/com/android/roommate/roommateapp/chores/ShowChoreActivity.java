@@ -17,6 +17,7 @@ public class ShowChoreActivity extends Activity {
     public static final String IS_COMPLETED= "ic";
     public static final String FIELD_DESC = "fDesc";
     public static final String FIELD_FREQ = "fFreq";
+    public static final String FIELD_VALUE = "value";
     public static final int COMPLETE = 0;
     public static final int DELETE = 1;
     public static final int EDIT = 2;
@@ -24,6 +25,7 @@ public class ShowChoreActivity extends Activity {
     private final int EDIT_CHORE_REQUEST_CODE = 8;
     private String description;
     private String frequency;
+    private int value;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -59,8 +61,11 @@ public class ShowChoreActivity extends Activity {
         //set textviews
         description = getIntent().getStringExtra(FIELD_DESC);
         frequency = getIntent().getStringExtra(FIELD_FREQ);
+        value = getIntent().getIntExtra(FIELD_VALUE, -1);
+
         ((TextView)findViewById(R.id.desc_textview)).setText(description);
         ((TextView)findViewById(R.id.freq_text_view)).setText(frequency);
+        ((TextView)findViewById(R.id.chore_val_text_view)).setText(value + "");
     }
 
     private void cancelChore(){
@@ -88,6 +93,7 @@ public class ShowChoreActivity extends Activity {
         i.putExtra(NewChoreActivity.IS_EDIT, true);
         i.putExtra(NewChoreActivity.DESC, description);
         i.putExtra(NewChoreActivity.FREQ, frequency);
+        i.putExtra(NewChoreActivity.VALUE, value);
         startActivityForResult(i, EDIT_CHORE_REQUEST_CODE);
     }
 
@@ -98,6 +104,8 @@ public class ShowChoreActivity extends Activity {
             returnWithEdits.putExtra(IS_COMPLETED, EDIT);
             returnWithEdits.putExtra(FIELD_DESC, data.getStringExtra(NewChoreActivity.DESC));
             returnWithEdits.putExtra(FIELD_FREQ, data.getStringExtra(NewChoreActivity.FREQ));
+            returnWithEdits.putExtra(FIELD_VALUE, data.getIntExtra(NewChoreActivity.VALUE,
+                    -1));
             setResult(RESULT_OK, returnWithEdits);
         }
         else{

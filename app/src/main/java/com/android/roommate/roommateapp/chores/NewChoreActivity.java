@@ -23,11 +23,13 @@ public class NewChoreActivity extends AppCompatActivity {
 
     EditText descriptionInput;
     Spinner freqSpinner;
+    EditText valInput;
     private Handler editTextFocuser;
 
     public static final String IS_EDIT = "isEdit";
     public static final String DESC = "desc";
     public static final String FREQ = "freq";
+    public static final String VALUE = "val";
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -38,6 +40,7 @@ public class NewChoreActivity extends AppCompatActivity {
         //set view fields
         descriptionInput = findViewById(R.id.new_chore_desc_input);
         freqSpinner = findViewById(R.id.new_chore_frequency_spinner);
+        valInput = findViewById(R.id.new_chore_val_input);
 
         //set adapter and initialize values for spinner
         ArrayAdapter<CharSequence> adapter;
@@ -93,6 +96,7 @@ public class NewChoreActivity extends AppCompatActivity {
         if(intent.getBooleanExtra(IS_EDIT, false)){
             descriptionInput.setText(intent.getStringExtra(DESC));
             setSpinnerSelection(intent.getStringExtra(FREQ));
+            valInput.setText(Integer.toString(intent.getIntExtra(VALUE, -1)));
         }
 
     }
@@ -115,6 +119,7 @@ public class NewChoreActivity extends AppCompatActivity {
         //Toast.makeText(this, descriptionInput.getEditableText(), Toast.LENGTH_LONG);
         resIntent.putExtra(DESC, descriptionInput.getEditableText().toString());
         resIntent.putExtra(FREQ, freqSpinner.getSelectedItem().toString());
+        resIntent.putExtra(VALUE, Integer.parseInt(valInput.getEditableText().toString()));
         setResult(RESULT_OK, resIntent);
         finish();
     }

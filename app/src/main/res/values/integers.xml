@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="new_chore_res_code">10</integer>
+    <integer name="debug_user_id">117</integer>
 </resources>

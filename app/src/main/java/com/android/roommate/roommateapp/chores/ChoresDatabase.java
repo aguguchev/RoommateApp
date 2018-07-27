@@ -15,7 +15,8 @@ import com.android.roommate.roommateapp.R;
 
 public class ChoresDatabase extends SQLiteOpenHelper {
     public static final String CHORES_TABLE_NAME = "chores";
-    public static final String FREQS_TABLE_NAME = "frequencies";
+    public static final String CHISTORY_TABLE_NAME = "chistory";
+    public final int USER_ID;
 
     public static final String DATABASE_NAME = "RA_App.db";
     private static int DATABASE_VERSION = 2;
@@ -24,6 +25,13 @@ public class ChoresDatabase extends SQLiteOpenHelper {
     public static final String DESC = "Description";
     public static final String FREQ= "Frequency";
     public static final String LAST_COMPLETE = "LastComplete";
+    public static final String VALUE = "Value";
+
+    public static final String H_ID = "H_ID";
+    public static final String H_USER_ID = "User_ID";
+    public static final String H_DATE_COMPLETED = "Date_Completed";
+    public static final String H_VALUE = "Value";
+    //TODO:IMPLEMENT CHORE COMPLETION HISTORY TABLE
 
     public static final String F_ID = "F_ID";
     public static final String F_FREQ = "F_FREQ";
@@ -31,21 +39,37 @@ public class ChoresDatabase extends SQLiteOpenHelper {
 
     public ChoresDatabase(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        if(!BuildConfig.DEBUG)
+        if(!BuildConfig.DEBUG) {
             POSSIBLE_FREQS = context.getResources().getStringArray(R.array.chores_frequencies);
-        else
+            USER_ID = 117;//TODO:IMPLEMENT USER ID SYSTEM FOR PRODUCTION BUILD
+        }
+        else {
             POSSIBLE_FREQS = context.getResources().getStringArray(R.array.debug_chores_frequencies);
+            USER_ID = context.getResources().getInteger(R.integer.debug_user_id);
+        }
     }
 
-    private void createTable(SQLiteDatabase sqLiteDatabase) {
+    private void createTables(SQLiteDatabase sqLiteDatabase) {
         //query to create main chores table
         String qs = "CREATE TABLE " + CHORES_TABLE_NAME + "(" +
                 ID + " INTEGER PRIMARY KEY, " +
                 DESC + " TEXT, " +
                 FREQ + " INTEGER, " +
-                LAST_COMPLETE + " REAL);";
+                LAST_COMPLETE + " REAL, " +
+                VALUE + " INTEGER);";
+
+        //query to create chistory table
+        String ch = "CREATE TABLE " + CHISTORY_TABLE_NAME + "(" +
+                H_ID + " INTEGER PRIMARY KEY, " +
+                H_DATE_COMPLETED + " REAL, " +
+                H_USER_ID + " INTEGER, " +
+                H_VALUE + " INTEGER);";
 
         sqLiteDatabase.execSQL(qs);
+        sqLiteDatabase.execSQL(ch);
+
+        //query to create chore history table
+
     }
 
     public ChoresCursor getChores(){
@@ -58,11 +82,11 @@ public class ChoresDatabase extends SQLiteOpenHelper {
         return c;
     }
 
-    public Chore addChore(String desc, String freq){
+    public Chore addChore(String desc, String freq, int val){
         long initialLC = Chore.computeLCMinusInterval(freq).getTimeInMillis() - 1;
         String sql = "INSERT INTO " + CHORES_TABLE_NAME + "(" + DESC + ", " + FREQ
-                + ", " + LAST_COMPLETE + ") VALUES (?, ?, ?)";
-        Object[] bindArgs = new Object[]{desc, freq, initialLC};
+                + ", " + LAST_COMPLETE + ", " + VALUE + ") VALUES (?, ?, ?, ?)";
+        Object[] bindArgs = new Object[]{desc, freq, initialLC, val};
         try {
             getWritableDatabase().execSQL(sql, bindArgs);
             Log.d("dbPersistence", ": " + desc);
@@ -77,16 +101,18 @@ public class ChoresDatabase extends SQLiteOpenHelper {
         ChoresCursor c = (ChoresCursor) d.rawQueryWithFactory(
                 new ChoresCursor.CCFactory(), ret, null, null);
         c.moveToFirst();
-        return new Chore(c.getColChoresID(), initialLC, desc, freq);
+        Chore newChore = new Chore(c.getColChoresID(), initialLC, desc, freq, val);
+        return newChore;
     }
 
-    public void editChore(long choreID, String desc, String freq, long lastComplete){
+    public void editChore(long choreID, String desc, String freq, long lastComplete, int val){
         String sql = "UPDATE " + CHORES_TABLE_NAME + " SET " +
                 DESC + " = ?, " +
                 FREQ + " = ?, " +
-                LAST_COMPLETE + " = ? " +
+                LAST_COMPLETE + " = ?, " +
+                VALUE + " = ? " +
                 "WHERE " + ID + " = ?";
-        Object[] bindArgs = new Object[]{desc, freq, lastComplete, choreID};
+        Object[] bindArgs = new Object[]{desc, freq, lastComplete, choreID, val};
         try{
             getWritableDatabase().execSQL(sql, bindArgs);
         }catch (SQLException e){
@@ -104,27 +130,40 @@ public class ChoresDatabase extends SQLiteOpenHelper {
         }
     }
 
+    public CHCursor getChoreHistory(){
+        SQLiteDatabase d = getReadableDatabase();
+        CHCursor c = (CHCursor) d.rawQueryWithFactory(
+                new CHCursor.CHCFactory(), CHCursor.QUERY, null, null);
+        c.moveToFirst();
+        return c;
+    }
+
+    public void logCompletion(Chore c){
+        String sql = "INSERT INTO " + CHISTORY_TABLE_NAME + " (" + H_DATE_COMPLETED + ", " +
+                H_USER_ID + ", " + H_VALUE + ") VALUES (?, ?, ?)";
+        Object[] bindArgs = new Object[]{c.getLastComplete().getTime(), USER_ID, c.getValue()};
+        try{
+            getWritableDatabase().execSQL(sql);
+        } catch(SQLException e){
+            Log.e("Error logging chore", e.toString());
+        }
+    }
+
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase){
-        createTable(sqLiteDatabase);
+        createTables(sqLiteDatabase);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldv, int newv){
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + CHORES_TABLE_NAME + ";");
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + FREQS_TABLE_NAME + ";");
-        createTable(sqLiteDatabase);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + CHISTORY_TABLE_NAME + ";");
+        createTables(sqLiteDatabase);
     }
 
     public static class ChoresCursor extends SQLiteCursor{
         private static final String QUERY = "SELECT " + ID + ", " + DESC + ", " + FREQ +
-                ", " + LAST_COMPLETE + " FROM " + CHORES_TABLE_NAME;
-        private static final String QUERYWITHJOIN = "SELECT " + ID + ", " + DESC + ", " + F_FREQ +
-                ", " + LAST_COMPLETE +
-                " FROM " + CHORES_TABLE_NAME +
-                " INNER JOIN " + FREQS_TABLE_NAME +
-                " ON " + CHORES_TABLE_NAME + "." + FREQ + " = " + FREQS_TABLE_NAME + "." + F_ID +
-                " ORDER BY " + F_FREQ + ";";
+                ", " + LAST_COMPLETE + ", " + VALUE + " FROM " + CHORES_TABLE_NAME;
         private ChoresCursor(SQLiteDatabase db, SQLiteCursorDriver driver, String editTable,
                              SQLiteQuery query){
             super(db, driver, editTable, query);
@@ -145,9 +184,29 @@ public class ChoresDatabase extends SQLiteOpenHelper {
         public String getColChoresFreq(){
             return getString(getColumnIndexOrThrow(FREQ));
         }
-        public long getColChoresLastComplete(){
-            return getLong(getColumnIndexOrThrow(LAST_COMPLETE));
+        public long getColChoresLastComplete(){ return getLong(getColumnIndexOrThrow(LAST_COMPLETE));}
+        public int getColChoresVal(){return getInt(getColumnIndexOrThrow(VALUE));}
+
+    }
+
+    public static class CHCursor extends SQLiteCursor{
+        private static final String QUERY = "SELECT " + H_ID + ", " + H_DATE_COMPLETED + ", " +
+                H_USER_ID + ", " + H_VALUE + " FROM " + CHISTORY_TABLE_NAME;
+        private CHCursor(SQLiteDatabase db, SQLiteCursorDriver driver, String editTable,
+                             SQLiteQuery query){
+            super(db, driver, editTable, query);
         }
+        private static class CHCFactory implements SQLiteDatabase.CursorFactory{
+            @Override
+            public Cursor newCursor(SQLiteDatabase db, SQLiteCursorDriver driver, String editTable,
+                                    SQLiteQuery query){
+                return new CHCursor(db, driver, editTable, query);
+            }
+        }
+        public int getColCHID(){return getInt(getColumnIndexOrThrow(H_ID));}
+        public long getColCHDateCompleted(){return getLong(getColumnIndexOrThrow(H_DATE_COMPLETED));}
+        public int getColCHUserID(){return getInt(getColumnIndexOrThrow(H_USER_ID));}
+        public int getColCHValue(){return getInt(getColumnIndexOrThrow(H_VALUE));}
 
     }
 }

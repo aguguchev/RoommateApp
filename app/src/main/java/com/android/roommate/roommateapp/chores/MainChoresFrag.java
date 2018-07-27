@@ -117,6 +117,7 @@ public class MainChoresFrag extends Fragment {
         Intent showChoreIntent = new Intent(myView.getContext(), ShowChoreActivity.class);
         showChoreIntent.putExtra(ShowChoreActivity.FIELD_DESC, toShow.getDescription());
         showChoreIntent.putExtra(ShowChoreActivity.FIELD_FREQ, toShow.getFrequency());
+        showChoreIntent.putExtra(ShowChoreActivity.FIELD_VALUE, toShow.getValue());
         startActivityForResult(showChoreIntent, SHOW_CHORE_REQUEST_CODE);
     }
 
@@ -130,7 +131,12 @@ public class MainChoresFrag extends Fragment {
         if(requestCode == NEW_CHORE_REQUEST_CODE && resultCode == RESULT_OK){
             String freq = data.getStringExtra(NewChoreActivity.FREQ);
             String desc = data.getStringExtra(NewChoreActivity.DESC);
-            choresController.addChore(desc, freq);
+
+            //CHORE VALUE DEFAULTS TO -1 TO THROW AN ERROR IF VALUE IS NOT FOUND IN INTENT
+            //THIS IS ON PURPOSE, IF GETTING EXCEPTIONS FROM CHORE CLASS LOOK HERE
+
+            int val = data.getIntExtra(NewChoreActivity.VALUE, -1);
+            choresController.addChore(desc, freq, val);
             choresController.notifyDataSetChanged();
         }
         else if(requestCode == SHOW_CHORE_REQUEST_CODE && resultCode == RESULT_OK){
@@ -143,7 +149,17 @@ public class MainChoresFrag extends Fragment {
             else if(res == ShowChoreActivity.EDIT) {
                 String desc = data.getStringExtra(ShowChoreActivity.FIELD_DESC);
                 String freq = data.getStringExtra(ShowChoreActivity.FIELD_FREQ);
-                choresController.editChore(selectedChoreGroup, selectedChoreItem, desc, freq);
+
+                //SAME HERE WITH CHORE VALUE DEFAULT AS -1, IF GETTING EXCEPTIONS LOOK HERE
+
+                int val = data.getIntExtra(ShowChoreActivity.FIELD_VALUE, -1);
+                try {
+                    choresController.editChore(selectedChoreGroup,
+                            selectedChoreItem, desc, freq, val);
+                } catch(Exception e){
+                    Toast.makeText(getContext(),
+                            "Value must be greater than or equal to 0", Toast.LENGTH_LONG);
+                }
             }
             choresController.notifyDataSetChanged();
 
