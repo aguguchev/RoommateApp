@@ -1,7 +1,10 @@
 package com.android.roommate.roommateapp.chores;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.database.DataSetObserver;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +52,15 @@ public class ChoresExpandableListAdapter extends BaseExpandableListAdapter {
             listDetail.put(title, new ArrayList<Chore>());
         }
         listDetail.get(title).add(new Chore(title, desc));
+    }
+
+    public void completeChore(int group, int item){
+        if(group < 0 || item < 0 || group > listTitles.size()
+                || item > listDetail.get(listTitles.get(group)).size()){
+            throw new RuntimeException("Invalid chore to complete");
+        }
+        Chore toComplete = listDetail.get(listTitles.get(group)).get(item);
+        toComplete.complete();
     }
 
     @Override
@@ -103,7 +115,9 @@ public class ChoresExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
                              View convertView, ViewGroup parent) {      /////Done/////
-        final String expandedListText = getChild(groupPosition, childPosition).toString();
+        String mod = ((Chore)getChild(groupPosition, childPosition)).isCompleted()
+                ? "(COMPLETE)" : "";
+        final String expandedListText = getChild(groupPosition, childPosition).toString() + mod;
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);

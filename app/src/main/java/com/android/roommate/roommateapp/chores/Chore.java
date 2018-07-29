@@ -13,7 +13,7 @@ class Chore {
     Chore(String freq, String desc){
         description = desc;
         frequency = freq;
-        completed = true;
+        completed = false;
         Calendar calendar = new GregorianCalendar();
         lastComplete = calendar.getTime();
     }
@@ -37,6 +37,11 @@ class Chore {
 
     }
 
+    void complete(){
+        completed = true;
+        lastComplete = (new GregorianCalendar()).getTime();
+    }
+
     @Override
     public String toString(){
         return description;
@@ -51,7 +56,7 @@ class Chore {
     Date getLastComplete(){
         return lastComplete;
     }
-    boolean getCompleted(){
+    boolean isCompleted(){
         return completed;
     }
 }
