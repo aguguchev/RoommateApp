@@ -18,10 +18,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-/**
- * Created by VengefulLimaBean on 3/19/2018.
- */
-
 public class ChoresExpandableListAdapter extends BaseExpandableListAdapter {
 
     private Context context;

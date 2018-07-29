@@ -13,6 +13,8 @@
     <string name="chores_desc_data_id">desc_data</string>
     <string name="chores_freq_data_id">freq_data</string>
     <string name="complete">Complete</string>
+    <string name="price">Price:</string>
+    <string name="pay">Pay</string>
     <string-array name="chores_frequencies">
         <item>Daily</item>
         <item>Weekly</item>

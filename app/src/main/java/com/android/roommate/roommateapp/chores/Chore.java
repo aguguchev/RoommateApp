@@ -46,7 +46,6 @@ class Chore {
     public String toString(){
         return description;
     }
-
     String getDescription(){
         return description;
     }
