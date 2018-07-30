@@ -118,6 +118,8 @@ public class MainChoresFrag extends Fragment {
         showChoreIntent.putExtra(ShowChoreActivity.FIELD_DESC, toShow.getDescription());
         showChoreIntent.putExtra(ShowChoreActivity.FIELD_FREQ, toShow.getFrequency());
         showChoreIntent.putExtra(ShowChoreActivity.FIELD_VALUE, toShow.getValue());
+        //TODO:DISABLE COMPLETE BUTTON WHEN CHORE IS ALREADY IN COMPLETED STATE
+        showChoreIntent.putExtra(ShowChoreActivity.FIELD_IS_COMPLETE, )
         startActivityForResult(showChoreIntent, SHOW_CHORE_REQUEST_CODE);
     }
 

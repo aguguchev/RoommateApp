@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.android.roommate.roommateapp.R;
@@ -18,6 +19,7 @@ public class ShowChoreActivity extends Activity {
     public static final String FIELD_DESC = "fDesc";
     public static final String FIELD_FREQ = "fFreq";
     public static final String FIELD_VALUE = "value";
+    public static final String FIELD_IS_COMPLETE = "isComplete";
     public static final int COMPLETE = 0;
     public static final int DELETE = 1;
     public static final int EDIT = 2;
@@ -45,18 +47,20 @@ public class ShowChoreActivity extends Activity {
                 cancelChore();
             }
         });
-        findViewById(R.id.complete_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                completeChore();
-            }
-        });
         findViewById(R.id.edit_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 editChore();
             }
         });
+        Button completeButton = findViewById(R.id.complete_button);
+        completeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                completeChore();
+            }
+        });
+        completeButton.setEnabled(getIntent().getBooleanExtra(FIELD_IS_COMPLETE, false));
 
         //set textviews
         description = getIntent().getStringExtra(FIELD_DESC);

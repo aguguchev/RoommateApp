@@ -54,7 +54,6 @@ class Chore {
     public String toString(){
         return description;
     }
-
     String getDescription(){
         return description;
     }
@@ -77,4 +76,5 @@ class Chore {
     }
     void setDescription(String d){ description = d;}
     void setFrequency(String f){ frequency = f;}
+
 }
