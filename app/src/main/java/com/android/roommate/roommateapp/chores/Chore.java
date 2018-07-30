@@ -77,4 +77,5 @@ class Chore {
     }
     void setDescription(String d){ description = d;}
     void setFrequency(String f){ frequency = f;}
+
 }

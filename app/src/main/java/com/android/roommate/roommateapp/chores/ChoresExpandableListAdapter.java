@@ -32,7 +32,7 @@ public class ChoresExpandableListAdapter extends BaseExpandableListAdapter {
         context = c;
         listTitles = new ArrayList<String>();
         listDetail = new HashMap<String, List<Chore>>();
-        choresDB = new ChoresDatabase(c);
+        choresDB = ChoresDatabase.getInstance(c);
 
         //fill list with stored chores
         ChoresDatabase.ChoresCursor cc = choresDB.getChores();
@@ -73,6 +73,7 @@ public class ChoresExpandableListAdapter extends BaseExpandableListAdapter {
         toComplete.complete();
         choresDB.editChore(toComplete.getId(), toComplete.getDescription(), toComplete.getFrequency(),
                 toComplete.getLastComplete().getTime(), toComplete.getValue());
+        choresDB.logCompletion(toComplete);
     }
 
     public void deleteChore(int group, int item){

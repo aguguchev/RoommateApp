@@ -14,6 +14,8 @@ import com.android.roommate.roommateapp.BuildConfig;
 import com.android.roommate.roommateapp.R;
 
 public class ChoresDatabase extends SQLiteOpenHelper {
+    public static ChoresDatabase choresDB;
+
     public static final String CHORES_TABLE_NAME = "chores";
     public static final String CHISTORY_TABLE_NAME = "chistory";
     public final int USER_ID;
@@ -37,7 +39,14 @@ public class ChoresDatabase extends SQLiteOpenHelper {
     public static final String F_FREQ = "F_FREQ";
     public final String[] POSSIBLE_FREQS;
 
-    public ChoresDatabase(Context context){
+    public static synchronized ChoresDatabase getInstance(Context context){
+        if (choresDB == null) {
+            choresDB = new ChoresDatabase(context.getApplicationContext());
+        }
+        return choresDB;
+    }
+
+    private ChoresDatabase(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         if(!BuildConfig.DEBUG) {
             POSSIBLE_FREQS = context.getResources().getStringArray(R.array.chores_frequencies);
@@ -67,9 +76,6 @@ public class ChoresDatabase extends SQLiteOpenHelper {
 
         sqLiteDatabase.execSQL(qs);
         sqLiteDatabase.execSQL(ch);
-
-        //query to create chore history table
-
     }
 
     public ChoresCursor getChores(){
@@ -131,6 +137,9 @@ public class ChoresDatabase extends SQLiteOpenHelper {
     }
 
     public CHCursor getChoreHistory(){
+        //fill chistory table with dummy values if desired
+        addDummyDataToCHistory();
+
         SQLiteDatabase d = getReadableDatabase();
         CHCursor c = (CHCursor) d.rawQueryWithFactory(
                 new CHCursor.CHCFactory(), CHCursor.QUERY, null, null);
@@ -138,12 +147,23 @@ public class ChoresDatabase extends SQLiteOpenHelper {
         return c;
     }
 
+    private void addDummyDataToCHistory(){
+        String sql = "INSERT INTO " + CHISTORY_TABLE_NAME + " (" + H_DATE_COMPLETED + ", " +
+                H_USER_ID + ", " + H_VALUE + ") VALUES (0, 0, 1), (0, 0, 1), (0, 0, 1), (0, 0, 1)," +
+                "(0, 0, 1), (0, 1, 5), (0, 1, 5), (0, 1, 5), (0, 1, 5), (0, 1, 5), (0, 2, 10);";
+        try{
+            getWritableDatabase().execSQL(sql);
+        } catch (SQLException e){
+            Log.e("stddebug", e.toString());
+        }
+    }
+
     public void logCompletion(Chore c){
         String sql = "INSERT INTO " + CHISTORY_TABLE_NAME + " (" + H_DATE_COMPLETED + ", " +
                 H_USER_ID + ", " + H_VALUE + ") VALUES (?, ?, ?)";
         Object[] bindArgs = new Object[]{c.getLastComplete().getTime(), USER_ID, c.getValue()};
         try{
-            getWritableDatabase().execSQL(sql);
+            getWritableDatabase().execSQL(sql, bindArgs);
         } catch(SQLException e){
             Log.e("Error logging chore", e.toString());
         }
