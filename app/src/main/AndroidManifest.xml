@@ -41,6 +41,12 @@
                 android:value=".mainscreen.AppMainActivity" />
         </activity>
 
+        <activity android:name=".payments.NewPaymentActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".payments.PayMainActivity" />
+        </activity>
+
         <activity android:name=".schedule.ScheduleMainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
