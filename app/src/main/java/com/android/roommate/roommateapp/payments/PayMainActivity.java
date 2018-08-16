@@ -6,7 +6,9 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.Button;
 
 import com.android.roommate.roommateapp.R;
 
@@ -16,8 +18,10 @@ public class PayMainActivity extends AppCompatActivity {
 
    private ListView payMainListView;
    private FloatingActionButton newPaymentButt;
-   private ArrayList<Payment> unpaidPayments;
-   private ArrayAdapter<Payment> adapter;
+//   private ArrayList<String> unpaidPayments;
+//   private ArrayAdapter<String> adapter;
+    private ArrayList<Payment> unpaidPayments;
+
 
     final int NEW_PAYMENT_REQUEST_CODE = 10;
     final int SHOW_PAYMENT_REQUEST_CODE = 20;
@@ -30,13 +34,22 @@ public class PayMainActivity extends AppCompatActivity {
         payMainListView = findViewById(R.id.unpaid_list);
         newPaymentButt = findViewById(R.id.new_payment_butt);
 
-        unpaidPayments =  new ArrayList<>();
+//        unpaidPayments =  new ArrayList<String>();
+//        unpaidPayments.add("Test");
+//        unpaidPayments.add("Test 2");
+//        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, unpaidPayments );
+//        payMainListView.setAdapter(adapter);
         newPaymentButt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 createNewPayment();
             }
         });
+
+
+
+
+
     }
 
     private void createNewPayment(){
@@ -49,14 +62,13 @@ public class PayMainActivity extends AppCompatActivity {
         if(requestCode == NEW_PAYMENT_REQUEST_CODE && resultCode == RESULT_OK){
             //String title = data.getStringExtra(getResources().getString(R.string.payments_freq_data_id));
             //String desc = data.getStringExtra(getResources().getString(R.string.payments_desc_data_id));
-            //paymentsController.addChore(title, desc);
+            //paymentsController.addPayment(title, desc);
             //paymentsController.notifyDataSetChanged();
         }
         else if(requestCode == SHOW_PAYMENT_REQUEST_CODE && resultCode == RESULT_OK){
-            //paymentsController.completeChore(selectedChoreGroup, selectedChoreItem);
+            //paymentsController.pay(selectedChoreGroup, selectedChoreItem);
             //paymentsController.notifyDataSetChanged();
-            //selectedChoreItem = -1;
-            //selectedChoreGroup = -1;
+
         }
     }
     
