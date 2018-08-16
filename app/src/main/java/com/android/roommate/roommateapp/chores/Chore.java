@@ -1,5 +1,5 @@
 package com.android.roommate.roommateapp.chores;
-
+//TODO: USE LINT INSPECTOR TO CLEAN UP CODE
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -9,7 +9,7 @@ class Chore {
     private String frequency;
     private Date lastComplete;
     private boolean completed;
-    private int id;
+    final private int ID;
     private int value;
 
     Chore(int id, long lC, String desc, String freq, int val){
@@ -17,11 +17,8 @@ class Chore {
         frequency = freq;
         lastComplete = new Date(lC);
         value = val;
-        if(isCompleted(lastComplete, freq))
-            completed = true;
-        else
-            completed = false;
-        this.id = id;
+        completed = isCompleted(lastComplete, freq);
+        ID = id;
     }
 
     void complete(){
@@ -39,14 +36,20 @@ class Chore {
     public static Calendar computeLCMinusInterval(String freq){
         Calendar c = new GregorianCalendar();
         c.setLenient(true);
-        if(freq.equals("Daily"))
-            c.add(Calendar.DAY_OF_YEAR, -1);
-        else if(freq.equals("Weekly"))
-            c.add(Calendar.WEEK_OF_YEAR, -1);
-        else if(freq.equals("Month"))
-            c.add(Calendar.MONTH, -1);
-        else
-            c.add(Calendar.SECOND, -5);
+        switch(freq) {
+            case "Daily":
+                c.add(Calendar.DAY_OF_YEAR, -1);
+                break;
+            case "Weekly":
+                c.add(Calendar.WEEK_OF_YEAR, -1);
+                break;
+            case "Month":
+                c.add(Calendar.MONTH, -1);
+                break;
+            default:
+                c.add(Calendar.SECOND, -5);
+                break;
+        }
         return c;
     }
 
@@ -63,7 +66,7 @@ class Chore {
     Date getLastComplete(){
         return lastComplete;
     }
-    int getId() {return id;}
+    int getID() {return ID;}
     boolean isCompleted(){
         return completed;
     }

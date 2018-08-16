@@ -64,6 +64,7 @@
 
         <EditText
             android:id="@+id/new_chore_desc_input"
+            android:hint="@string/desc_input_hint"
             style="@style/NoUnderBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -88,6 +89,7 @@
 
     <EditText
         android:id="@+id/new_chore_val_input"
+        android:hint="@string/cValue_input_hint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"

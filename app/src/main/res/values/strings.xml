@@ -4,21 +4,15 @@
     <string name="schedule_label">Schedule</string>
     <string name="pay_label">Payment</string>
     <string name="shop_label">Shopping List</string>
-    <string name="freq_daily">Daily</string>
-    <string name="freq_weekly">Weekly</string>
-    <string name="freq_monthly">Monthly</string>
-    <string name="content_desc_new_chore">New Chore</string>
     <string name="description">Description:</string>
     <string name="save">Save</string>
-    <string name="chores_desc_data_id">desc_data</string>
-    <string name="chores_freq_data_id">freq_data</string>
     <string name="complete">Complete</string>
-<<<<<<< HEAD
     <string name="delete">Delete</string>
-=======
     <string name="price">Price:</string>
     <string name="pay">Pay</string>
->>>>>>> 19be052a4f206dee6c636650adf514434b5c7c16
+    <string name="desc_input_hint">Description</string>
+    <string name="cValue_input_hint">Value</string>
+    <string name="edit_chore_contentdescription">Edit Chore</string>
     <string-array name="chores_frequencies">
         <item>Daily</item>
         <item>Weekly</item>

@@ -36,7 +36,6 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
-        android:text="TextView"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cancel_button" />
@@ -48,7 +47,6 @@
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
-        android:text="TextView"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/desc_textview" />
@@ -81,7 +79,8 @@
         android:background="@android:drawable/ic_menu_edit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/freq_text_view"
-        app:srcCompat="@android:drawable/ic_menu_edit" />
+        app:srcCompat="@android:drawable/ic_menu_edit"
+        android:contentDescription="@string/edit_chore_contentdescription"/>
 
     <TextView
         android:id="@+id/chore_val_text_view"
@@ -91,7 +90,6 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:textSize="16sp"
-        android:text="TextView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/freq_text_view" />
 </android.support.constraint.ConstraintLayout>

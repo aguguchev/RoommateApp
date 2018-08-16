@@ -7,11 +7,8 @@ import android.support.v4.view.ViewPager;
 import com.android.roommate.roommateapp.R;
 
 public class ChoresMainActivity extends FragmentActivity {
-    final String MAINFRAG_TAG = "mainfrag";
-    private float x1, x2;
-    static final int MIN_DISTANCE = 150;
-    ChoresPagerAdapter pagerAdapter;
-    ViewPager vPager;
+    private ChoresPagerAdapter pagerAdapter;
+    private ViewPager vPager;
 
     @Override
     public void onCreate(Bundle state){
@@ -20,7 +17,7 @@ public class ChoresMainActivity extends FragmentActivity {
 
         //initialize pager
         pagerAdapter = new ChoresPagerAdapter(getSupportFragmentManager());
-        vPager = (ViewPager) findViewById(R.id.pager);
+        vPager = findViewById(R.id.pager);
         vPager.setAdapter(pagerAdapter);
     }
 

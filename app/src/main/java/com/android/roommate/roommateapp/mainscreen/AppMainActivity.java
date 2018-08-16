@@ -20,8 +20,7 @@ import com.android.roommate.roommateapp.shoppinglist.ShoppingMainActivity;
 
 public class AppMainActivity extends AppCompatActivity {
 
-    NavigationView navigationView;
-    DrawerLayout navDrawerLayout;
+    private DrawerLayout navDrawerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +41,7 @@ public class AppMainActivity extends AppCompatActivity {
         findViewById(R.id.shop_butt).setOnClickListener(clickListener);
 
         //gets navdrawer layout and view
-        navigationView = findViewById(R.id.main_nav_view);
+        NavigationView navigationView = findViewById(R.id.main_nav_view);
         navDrawerLayout = findViewById(R.id.main_drawer_layout);
 
         //assigns listener for drawer items
@@ -59,6 +58,7 @@ public class AppMainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
+        assert actionbar != null;
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.nav_menu_black_24dp);
 
@@ -68,14 +68,20 @@ public class AppMainActivity extends AppCompatActivity {
     private void navToFunction(View view){
         int id = view.getId();
         Intent intent = null;
-        if(id == R.id.chore_butt)
-            intent = new Intent(this, ChoresMainActivity.class);
-        else if(id == R.id.pay_butt)
-            intent = new Intent(this, PayMainActivity.class);
-        else if(id == R.id.sched_butt)
-            intent = new Intent(this, ScheduleMainActivity.class);
-        else if(id == R.id.shop_butt)
-            intent = new Intent(this, ShoppingMainActivity.class);
+        switch (id) {
+            case R.id.chore_butt:
+                intent = new Intent(this, ChoresMainActivity.class);
+                break;
+            case R.id.pay_butt:
+                intent = new Intent(this, PayMainActivity.class);
+                break;
+            case R.id.sched_butt:
+                intent = new Intent(this, ScheduleMainActivity.class);
+                break;
+            case R.id.shop_butt:
+                intent = new Intent(this, ShoppingMainActivity.class);
+                break;
+        }
 
         if(intent != null){
             startActivity(intent);
@@ -88,14 +94,20 @@ public class AppMainActivity extends AppCompatActivity {
 
         int id = item.getItemId();
         Intent intent = null;
-        if(id == R.id.chores_navdrawer_item)
-            intent = new Intent(this, ChoresMainActivity.class);
-        else if(id == R.id.payments_navdrawer_item)
-            intent = new Intent(this, PayMainActivity.class);
-        else if(id == R.id.schedule_navdrawer_item)
-            intent = new Intent(this, ScheduleMainActivity.class);
-        else if(id == R.id.shopping_navdrawer_item)
-            intent = new Intent(this, ShoppingMainActivity.class);
+        switch (id) {
+            case R.id.chores_navdrawer_item:
+                intent = new Intent(this, ChoresMainActivity.class);
+                break;
+            case R.id.payments_navdrawer_item:
+                intent = new Intent(this, PayMainActivity.class);
+                break;
+            case R.id.schedule_navdrawer_item:
+                intent = new Intent(this, ScheduleMainActivity.class);
+                break;
+            case R.id.shopping_navdrawer_item:
+                intent = new Intent(this, ShoppingMainActivity.class);
+                break;
+        }
 
         if(intent != null){
             startActivity(intent);
