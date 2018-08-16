@@ -2,6 +2,7 @@ package com.android.roommate.roommateapp.chores;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -11,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import com.android.roommate.roommateapp.R;
 
@@ -20,24 +20,25 @@ import static android.app.Activity.RESULT_OK;
 
 public class MainChoresFrag extends Fragment {
 
-    ChoresExpandableListAdapter choresController;
-    ExpandableListView expListView;
-    ImageButton newChoreButton;
+    private ChoresExpandableListAdapter choresController;
+    private ExpandableListView expListView;
+    private ImageButton newChoreButton;
     private final int NEW_CHORE_REQUEST_CODE = 10;
     private final int SHOW_CHORE_REQUEST_CODE = 20;
     private int selectedChoreGroup;
     private int selectedChoreItem;
     private View myView;
-    final int SWIPE_MIN_DISTANCE = 120;
-    final int SWIPE_MAX_OFF_PATH = 250;
-    final int SWIPE_THRESHOLD_VELOCITY = 200;
+    private final int SWIPE_MIN_DISTANCE = 120;
+    private final int SWIPE_MAX_OFF_PATH = 250;
+    private final int SWIPE_THRESHOLD_VELOCITY = 200;
 
+    @SuppressWarnings("EmptyMethod")
     public void onCreate(Bundle state){
         super.onCreate(state);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle b){
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle b){
         View view = inflater.inflate(R.layout.chores_frag, container, false);
 
         //assign all Views
@@ -50,7 +51,7 @@ public class MainChoresFrag extends Fragment {
         expListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
-                launchShowChoreActivity(i, i1, l);
+                launchShowChoreActivity(i, i1);
                 return false;
             }
         });
@@ -97,6 +98,7 @@ public class MainChoresFrag extends Fragment {
         view.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                v.performClick();
                 return gesture.onTouchEvent(event);
             }
         });
@@ -105,11 +107,19 @@ public class MainChoresFrag extends Fragment {
         return view;
     }
     private void testToast(String str){
-        Toast.makeText(getActivity(), str, Toast.LENGTH_SHORT);
         Log.d("debug", str);
     }
 
-    private void launchShowChoreActivity(int i, int i1, long l){
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        //refreshes data if fragment switches
+        if(isVisibleToUser && choresController != null) {
+            choresController.refreshData();
+        }
+    }
+
+    private void launchShowChoreActivity(int i, int i1){
         selectedChoreGroup = i;
         selectedChoreItem = i1;
 
@@ -118,12 +128,11 @@ public class MainChoresFrag extends Fragment {
         showChoreIntent.putExtra(ShowChoreActivity.FIELD_DESC, toShow.getDescription());
         showChoreIntent.putExtra(ShowChoreActivity.FIELD_FREQ, toShow.getFrequency());
         showChoreIntent.putExtra(ShowChoreActivity.FIELD_VALUE, toShow.getValue());
-        //TODO:DISABLE COMPLETE BUTTON WHEN CHORE IS ALREADY IN COMPLETED STATE
-        //showChoreIntent.putExtra(ShowChoreActivity.FIELD_IS_COMPLETE, )
+        showChoreIntent.putExtra(ShowChoreActivity.FIELD_IS_COMPLETE, toShow.isCompleted());
         startActivityForResult(showChoreIntent, SHOW_CHORE_REQUEST_CODE);
     }
 
-    public void launchCreateChoreActivity(){
+    private void launchCreateChoreActivity(){
         Intent newChoreIntent = new Intent(myView.getContext(), NewChoreActivity.class);
         startActivityForResult(newChoreIntent, NEW_CHORE_REQUEST_CODE);
     }
@@ -139,31 +148,34 @@ public class MainChoresFrag extends Fragment {
 
             int val = data.getIntExtra(NewChoreActivity.VALUE, -1);
             choresController.addChore(desc, freq, val);
-            choresController.notifyDataSetChanged();
+            choresController.refreshData(); //TODO: [OPTIMIZATION] MAYBE INSERT CHORES PRECISELY INSTEAD OF CALLING BLANKET UPDATE?
         }
         else if(requestCode == SHOW_CHORE_REQUEST_CODE && resultCode == RESULT_OK){
             int res = data.getIntExtra(ShowChoreActivity.IS_COMPLETED, -1);
             Log.d("stddebug", "Returning to main chores frag with code " + res);
-            if(res == ShowChoreActivity.COMPLETE)
-                choresController.completeChore(selectedChoreGroup, selectedChoreItem);
-            else if(res == ShowChoreActivity.DELETE)
-                choresController.deleteChore(selectedChoreGroup, selectedChoreItem);
-            else if(res == ShowChoreActivity.EDIT) {
-                String desc = data.getStringExtra(ShowChoreActivity.FIELD_DESC);
-                String freq = data.getStringExtra(ShowChoreActivity.FIELD_FREQ);
+            switch (res) {
+                case ShowChoreActivity.COMPLETE:
+                    choresController.completeChore(selectedChoreGroup, selectedChoreItem);
+                    break;
+                case ShowChoreActivity.DELETE:
+                    choresController.deleteChore(selectedChoreGroup, selectedChoreItem);
+                    break;
+                case ShowChoreActivity.EDIT:
+                    String desc = data.getStringExtra(ShowChoreActivity.FIELD_DESC);
+                    String freq = data.getStringExtra(ShowChoreActivity.FIELD_FREQ);
 
-                //SAME HERE WITH CHORE VALUE DEFAULT AS -1, IF GETTING EXCEPTIONS LOOK HERE
+                    //SAME HERE WITH CHORE VALUE DEFAULT AS -1, IF GETTING EXCEPTIONS LOOK HERE
 
-                int val = data.getIntExtra(ShowChoreActivity.FIELD_VALUE, -1);
-                try {
-                    choresController.editChore(selectedChoreGroup,
-                            selectedChoreItem, desc, freq, val);
-                } catch(Exception e){
-                    Toast.makeText(getContext(),
-                            "Value must be greater than or equal to 0", Toast.LENGTH_LONG);
-                }
+                    int val = data.getIntExtra(ShowChoreActivity.FIELD_VALUE, -1);
+                    try {
+                        choresController.editChore(selectedChoreGroup,
+                                selectedChoreItem, desc, freq, val);
+                    } catch (Exception e) {
+                        Log.e("FATAL", e.toString());
+                    }
+                    break;
             }
-            choresController.notifyDataSetChanged();
+            choresController.refreshData();
 
             //clears selection from fragment memory (?)
             selectedChoreItem = -1;

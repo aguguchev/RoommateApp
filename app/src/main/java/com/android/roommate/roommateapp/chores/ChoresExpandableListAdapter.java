@@ -1,7 +1,7 @@
 package com.android.roommate.roommateapp.chores;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.database.DataSetObserver;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,59 +9,47 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
+import com.android.roommate.roommateapp.BuildConfig;
 import com.android.roommate.roommateapp.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**	
  * Created by VengefulLimaBean on 3/19/2018.	
  */
 
-public class ChoresExpandableListAdapter extends BaseExpandableListAdapter {
+class ChoresExpandableListAdapter extends BaseExpandableListAdapter {
 
-    private Context context;
+    final private Context CONTEXT;
     private List<String> listTitles;
     private HashMap<String, List<Chore>> listDetail;
-    private DataSetObserver dataSetObserver = null;
-    private ChoresDatabase choresDB;
+    final private ChoresDatabase CHORES_DB;
+    private final String[] TITLE_ORDER;
 
-    public ChoresExpandableListAdapter(Context c){
+    ChoresExpandableListAdapter(Context c){
         super();
-        context = c;
-        listTitles = new ArrayList<String>();
-        listDetail = new HashMap<String, List<Chore>>();
-        choresDB = ChoresDatabase.getInstance(c);
+        CONTEXT = c;
+        CHORES_DB = ChoresDatabase.getInstance(c);
+        if(!BuildConfig.DEBUG)
+            TITLE_ORDER = c.getResources().getStringArray(R.array.chores_frequencies);
+        else
+            TITLE_ORDER = c.getResources().getStringArray(R.array.debug_chores_frequencies);
 
-        //fill list with stored chores
-        ChoresDatabase.ChoresCursor cc = choresDB.getChores();
-        Log.d("dbPersistence", cc.toString());
-        Log.d("dbPersistence", cc.getCount() + " ");
-        if(cc != null && cc.getCount() > 0){
-            do {
-                Log.d("dbPersistence", cc.hashCode() + ": Chore retrieved from db");
-                addChore(new Chore(cc.getColChoresID(), cc.getColChoresLastComplete(),
-                        cc.getColChoresDesc(), cc.getColChoresFreq(), cc.getColChoresVal()));
-            } while(cc.moveToNext());
-        }
-    }
-    public ChoresExpandableListAdapter(Context c, List<String> titles,
-                                       HashMap<String, List<Chore>> detail){
-        super();
-        context = c;
-        listTitles = titles;
-        listDetail = detail;
+        refreshData();
     }
 
     public void addChore(String desc, String freq, int val){
         if(!listTitles.contains(freq))
             setNewFreq(freq);
-        Chore c = choresDB.addChore(desc, freq, val);
+        Chore c = CHORES_DB.addChore(desc, freq, val);
         listDetail.get(freq).add(c);
     }
 
-    public void addChore(Chore c){
+    private void addChore(Chore c){
         if(!listTitles.contains(c.getFrequency()))
             setNewFreq(c.getFrequency());
         listDetail.get(c.getFrequency()).add(c);
@@ -70,16 +58,21 @@ public class ChoresExpandableListAdapter extends BaseExpandableListAdapter {
     public void completeChore(int group, int item){
         checkValidChore(group, item);
         Chore toComplete = listDetail.get(listTitles.get(group)).get(item);
+
+        float oldLC = toComplete.getLastComplete().getTime();
         toComplete.complete();
-        choresDB.editChore(toComplete.getId(), toComplete.getDescription(), toComplete.getFrequency(),
+        float newLC = toComplete.getLastComplete().getTime();
+        Log.v("stddebug", newLC > oldLC ? "Last Complete Updated Succesfully" : "Last Complete Not Updated");
+
+        CHORES_DB.editChore(toComplete.getID(), toComplete.getDescription(), toComplete.getFrequency(),
                 toComplete.getLastComplete().getTime(), toComplete.getValue());
-        choresDB.logCompletion(toComplete);
+        CHORES_DB.logCompletion(toComplete);
     }
 
     public void deleteChore(int group, int item){
         checkValidChore(group, item);
         Chore toDelete = listDetail.get(listTitles.get(group)).get(item);
-        choresDB.deleteChore(toDelete.getId());
+        CHORES_DB.deleteChore(toDelete.getID());
         listDetail.get(listTitles.get(group)).remove(item);
     }
 
@@ -89,7 +82,38 @@ public class ChoresExpandableListAdapter extends BaseExpandableListAdapter {
         toEdit.setDescription(desc);
         toEdit.setFrequency((freq));
         toEdit.setValue(val);
-        choresDB.editChore(toEdit.getId(), desc, freq, toEdit.getLastComplete().getTime(), val);
+        CHORES_DB.editChore(toEdit.getID(), desc, freq, toEdit.getLastComplete().getTime(), val);
+    }
+
+    public void refreshData(){
+       //clear previous data
+        listTitles = new ArrayList<>();
+        listDetail = new HashMap<>();
+
+        //extract stored chores from db
+        ArrayList<Chore> toBeAdded = new ArrayList<>();
+        Set<String> freqsPresent = new HashSet<>();
+        ChoresDatabase.ChoresCursor cc = CHORES_DB.getChores();
+        if(cc != null && cc.getCount() > 0){
+            do {
+                freqsPresent.add(cc.getColChoresFreq());
+                toBeAdded.add(new Chore(cc.getColChoresID(), cc.getColChoresLastComplete(),
+                        cc.getColChoresDesc(), cc.getColChoresFreq(), cc.getColChoresVal()));
+            } while(cc.moveToNext());
+        }
+
+        //fill listTitles in order with only populated categories
+        for(String freq : TITLE_ORDER)
+            if(freqsPresent.contains(freq)) {
+                listTitles.add(freq);
+                listDetail.put(freq, new ArrayList<Chore>());
+            }
+
+        //add all chores to listDetail
+        for(Chore c : toBeAdded)
+            addChore(c);
+
+        notifyDataSetChanged();
     }
 
     private void setNewFreq(String freq){
@@ -140,32 +164,55 @@ public class ChoresExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
+    @SuppressLint("InflateParams")
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView,
                              ViewGroup parent) {        /////Done/////
         final String titleText = listTitles.get(groupPosition);
         if (convertView == null) {
-            LayoutInflater layoutInflater = (LayoutInflater) this.context
+            LayoutInflater layoutInflater = (LayoutInflater) this.CONTEXT
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = layoutInflater.inflate(R.layout.list_group, null);
+            if(layoutInflater != null)
+                convertView = layoutInflater.inflate(R.layout.list_group, null);
+            else
+                Log.d("NULL POINTER CAUGHT", "ChoresExpandableListAdapter: layoutInflater " +
+                        "resolved to null");
         }
-        TextView listTitleTextView = (TextView) convertView.findViewById(R.id.listTitle);
-        listTitleTextView.setText(titleText);
+        TextView listTitleTextView;
+        if(convertView != null) {
+            listTitleTextView = convertView.findViewById(R.id.listTitle);
+            listTitleTextView.setText(titleText);
+        }
+        else
+            Log.d("NULL POINTER CAUGHT", "ChoresExpandableListAdapter: convertView " +
+                "resolved to null");
         return convertView;
     }
 
     @Override
+    @SuppressLint("InflateParams")
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
                              View convertView, ViewGroup parent) {      /////Done/////
-        String mod = ((Chore)getChild(groupPosition, childPosition)).isCompleted()
+        String mod = ((Chore) getChild(groupPosition, childPosition)).isCompleted()
                 ? "(COMPLETE)" : "";
         final String expandedListText = getChild(groupPosition, childPosition).toString() + mod;
         if (convertView == null) {
-            LayoutInflater layoutInflater = (LayoutInflater) this.context
+            LayoutInflater layoutInflater = (LayoutInflater) this.CONTEXT
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = layoutInflater.inflate(R.layout.list_item, null);
+            if (layoutInflater != null)
+                convertView = layoutInflater.inflate(R.layout.list_item, null);
+            else
+                Log.d("NULL POINTER CAUGHT", "ChoresExpandableListAdapter: layoutInflater " +
+                        "resolved to null");
         }
-        TextView expandedListTextView = (TextView) convertView.findViewById(R.id.expandedListItem);
-        expandedListTextView.setText(expandedListText);
+        TextView expandedListTextView;
+        if (convertView != null){
+            expandedListTextView = convertView.findViewById(R.id.expandedListItem);
+            expandedListTextView.setText(expandedListText);
+        }
+        else
+            Log.d("NULL POINTER CAUGHT", "ChoresExpandableListAdapter: convertView " +
+                    "resolved to null");
+
         return convertView;
     }
 

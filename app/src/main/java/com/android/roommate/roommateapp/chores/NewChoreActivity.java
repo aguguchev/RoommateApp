@@ -15,15 +15,18 @@ import android.widget.Spinner;
 import com.android.roommate.roommateapp.BuildConfig;
 import com.android.roommate.roommateapp.R;
 
+import java.util.Locale;
+
 /**
  * Created by VengefulLimaBean on 3/21/2018.
  */
 
+//TODO: MAKE HINT RANDOMLY POPULATE A LA ANDROID REMINDER APP
 public class NewChoreActivity extends AppCompatActivity {
 
-    EditText descriptionInput;
-    Spinner freqSpinner;
-    EditText valInput;
+    private EditText descriptionInput;
+    private Spinner freqSpinner;
+    private EditText valInput;
     private Handler editTextFocuser;
 
     public static final String IS_EDIT = "isEdit";
@@ -83,7 +86,7 @@ public class NewChoreActivity extends AppCompatActivity {
         editTextFocuser.postDelayed(focuser, 150);
 
         //set frame layout to redirect clicks to edittext
-        FrameLayout fLayout = (FrameLayout)findViewById(R.id.desc_inputbox);
+        FrameLayout fLayout = findViewById(R.id.desc_inputbox);
         fLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -96,7 +99,8 @@ public class NewChoreActivity extends AppCompatActivity {
         if(intent.getBooleanExtra(IS_EDIT, false)){
             descriptionInput.setText(intent.getStringExtra(DESC));
             setSpinnerSelection(intent.getStringExtra(FREQ));
-            valInput.setText(Integer.toString(intent.getIntExtra(VALUE, -1)));
+            valInput.setText(String.format(Locale.getDefault(), "%d",
+                    intent.getIntExtra(VALUE, -1)));
         }
 
     }
@@ -108,13 +112,13 @@ public class NewChoreActivity extends AppCompatActivity {
         descriptionInput.requestFocus();
     }
 
-    public void cancelNewChore(){
+    private void cancelNewChore(){
         Intent resIntent = new Intent();
         setResult(RESULT_CANCELED, resIntent);
         finish();
     }
 
-    public void saveNewChore(){
+    private void saveNewChore(){
         Intent resIntent = new Intent();
         //Toast.makeText(this, descriptionInput.getEditableText(), Toast.LENGTH_LONG);
         resIntent.putExtra(DESC, descriptionInput.getEditableText().toString());

@@ -1,33 +1,16 @@
 package com.android.roommate.roommateapp.payments;
 
-import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
-import android.app.Activity;
-import android.app.Dialog;
-import android.content.Context;
-import android.database.DataSetObserver;
-import android.support.v7.app.AlertDialog;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseExpandableListAdapter;
-import android.widget.ExpandableListAdapter;
-import android.widget.TextView;
-import android.content.Intent;
 
 import com.android.roommate.roommateapp.R;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-
-import com.android.roommate.roommateapp.R;
 
 public class PayMainActivity extends AppCompatActivity {
 
@@ -47,7 +30,7 @@ public class PayMainActivity extends AppCompatActivity {
         payMainListView = findViewById(R.id.unpaid_list);
         newPaymentButt = findViewById(R.id.new_payment_butt);
 
-        unpaidPayments =  new ArrayList<Payment>();
+        unpaidPayments =  new ArrayList<>();
         newPaymentButt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

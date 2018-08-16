@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import com.android.roommate.roommateapp.R;
 
+import java.util.Locale;
+
 /**
  * Created by VengefulLimaBean on 4/13/2018.
  */
@@ -60,7 +62,7 @@ public class ShowChoreActivity extends Activity {
                 completeChore();
             }
         });
-        completeButton.setEnabled(getIntent().getBooleanExtra(FIELD_IS_COMPLETE, false));
+        completeButton.setEnabled(!getIntent().getBooleanExtra(FIELD_IS_COMPLETE, false));
 
         //set textviews
         description = getIntent().getStringExtra(FIELD_DESC);
@@ -69,7 +71,7 @@ public class ShowChoreActivity extends Activity {
 
         ((TextView)findViewById(R.id.desc_textview)).setText(description);
         ((TextView)findViewById(R.id.freq_text_view)).setText(frequency);
-        ((TextView)findViewById(R.id.chore_val_text_view)).setText(value + "");
+        ((TextView)findViewById(R.id.chore_val_text_view)).setText(String.format(Locale.getDefault(), "%d", value));
     }
 
     private void cancelChore(){
