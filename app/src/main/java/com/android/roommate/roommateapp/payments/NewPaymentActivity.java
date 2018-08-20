@@ -19,6 +19,10 @@ public class NewPaymentActivity extends AppCompatActivity{
 
     private Button saveButton;
     private Button cancelButton;
+    private EditText descriptionInput;
+    private EditText numInput;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -28,6 +32,8 @@ public class NewPaymentActivity extends AppCompatActivity{
         // Add input of data
         saveButton = findViewById(R.id.save_button_payment);
         cancelButton = findViewById(R.id.cancel_button_payment);
+        descriptionInput = findViewById(R.id.new_payment_desc_input);
+        numInput = findViewById(R.id.new_payment_price_input);
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,10 +64,10 @@ public class NewPaymentActivity extends AppCompatActivity{
 
     public void saveNewPayment(){
         Intent resIntent = new Intent();
-        //resIntent.putExtra((String)getResources().getText(R.string.chores_desc_data_id),
-        //        descriptionInput.getEditableText().toString());
-        //resIntent.putExtra((String)getResources().getText(R.string.chores_freq_data_id),
-        //       freqSpinner.getSelectedItem().toString());
+        resIntent.putExtra((String)getResources().getText(R.string.chores_desc_data_id),
+               descriptionInput.getEditableText().toString());
+        resIntent.putExtra((String)getResources().getText(R.string.payment_price_data_id),
+                Integer.parseInt(numInput.getEditableText().toString()));
         setResult(RESULT_OK, resIntent);
         finish();
     }

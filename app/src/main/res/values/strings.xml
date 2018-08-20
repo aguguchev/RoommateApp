@@ -12,6 +12,8 @@
     <string name="save">Save</string>
     <string name="chores_desc_data_id">desc_data</string>
     <string name="chores_freq_data_id">freq_data</string>
+    <string name="payment_desc_data_id">desc_data</string>
+    <string name="payment_price_data_id">price_data</string>
     <string name="complete">Complete</string>
     <string name="price">Price:</string>
     <string name="pay">Pay</string>

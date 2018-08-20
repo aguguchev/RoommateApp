@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -35,13 +36,11 @@ public class PayMainActivity extends AppCompatActivity {
 
    private ListView payMainListView;
    private FloatingActionButton newPaymentButt;
-//   private ArrayList<String> unpaidPayments;
-//   private ArrayAdapter<String> adapter;
-    private ArrayList<Payment> unpaidPayments;
+   private PaymentAdapter payAdapter;
+   private int selectedPayment;
 
-
-    final int NEW_PAYMENT_REQUEST_CODE = 10;
-    final int SHOW_PAYMENT_REQUEST_CODE = 20;
+    final int NEW_PAYMENT_REQUEST_CODE = 30;
+    final int SHOW_PAYMENT_REQUEST_CODE = 40;
    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,11 +50,9 @@ public class PayMainActivity extends AppCompatActivity {
         payMainListView = findViewById(R.id.unpaid_list);
         newPaymentButt = findViewById(R.id.new_payment_butt);
 
-//        unpaidPayments =  new ArrayList<String>();
-//        unpaidPayments.add("Test");
-//        unpaidPayments.add("Test 2");
-//        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, unpaidPayments );
-//        payMainListView.setAdapter(adapter);
+        payAdapter = new PaymentAdapter(this);
+
+        payMainListView.setAdapter(payAdapter);
         newPaymentButt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -63,10 +60,23 @@ public class PayMainActivity extends AppCompatActivity {
             }
         });
 
+        payMainListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                showPayment(position);
+            }
+        });
 
+    }
 
+    private void showPayment(int position){
+        selectedPayment = position;
 
-
+        Payment toShow = (Payment)payAdapter.getItem(selectedPayment);
+        Intent showChoreIntent = new Intent(this, ShowPaymentActivity.class);
+        showChoreIntent.putExtra("desc_data", toShow.getitemName());
+        showChoreIntent.putExtra("price_data", toShow.getPrice() + "");
+        startActivityForResult(showChoreIntent, SHOW_PAYMENT_REQUEST_CODE);
     }
 
     private void createNewPayment(){
@@ -77,14 +87,15 @@ public class PayMainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         if(requestCode == NEW_PAYMENT_REQUEST_CODE && resultCode == RESULT_OK){
-            //String title = data.getStringExtra(getResources().getString(R.string.payments_freq_data_id));
-            //String desc = data.getStringExtra(getResources().getString(R.string.payments_desc_data_id));
-            //paymentsController.addPayment(title, desc);
-            //paymentsController.notifyDataSetChanged();
+            int price = data.getIntExtra(getResources().getString(R.string.payment_price_data_id), 0);
+            String desc = data.getStringExtra(getResources().getString(R.string.payment_desc_data_id));
+            payAdapter.addPayment(new Payment(desc, price));
+            payAdapter.notifyDataSetChanged();
         }
+
         else if(requestCode == SHOW_PAYMENT_REQUEST_CODE && resultCode == RESULT_OK){
-            //paymentsController.pay(selectedChoreGroup, selectedChoreItem);
-            //paymentsController.notifyDataSetChanged();
+            payAdapter.completePayment(selectedPayment);
+            payAdapter.notifyDataSetChanged();
 
         }
     }
