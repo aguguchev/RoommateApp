@@ -38,6 +38,7 @@ public class PayMainActivity extends AppCompatActivity {
    private FloatingActionButton newPaymentButt;
    private PaymentAdapter payAdapter;
    private int selectedPayment;
+   private PaymentsDatabase persistentPayments;
 
     final int NEW_PAYMENT_REQUEST_CODE = 30;
     final int SHOW_PAYMENT_REQUEST_CODE = 40;
@@ -51,6 +52,7 @@ public class PayMainActivity extends AppCompatActivity {
         newPaymentButt = findViewById(R.id.new_payment_butt);
 
         payAdapter = new PaymentAdapter(this);
+        persistentPayments = new PaymentsDatabase(this, null, null, 0 );
 
         payMainListView.setAdapter(payAdapter);
         newPaymentButt.setOnClickListener(new View.OnClickListener() {
